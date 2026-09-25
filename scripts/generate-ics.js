@@ -2,7 +2,8 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
-const OUTPUT = path.join(ROOT, "public", "taiwan-holidays.ics");
+const OUTPUT_DIR = path.join(ROOT, "public");
+const OUTPUT = path.join(OUTPUT_DIR, "taiwan-holidays.ics");
 
 function escapeICS(value) {
   return String(value ?? "")
@@ -29,6 +30,7 @@ function nextDate(date) {
 
 function loadHolidayFiles() {
   const dataDir = path.join(ROOT, "data");
+
   const years = fs
     .readdirSync(dataDir)
     .filter((name) => /^\d{4}$/.test(name))
@@ -95,8 +97,37 @@ const events = loadHolidayFiles();
 
 events.sort((a, b) => a.date.localeCompare(b.date));
 
-fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
-fs.writeFileSync(OUTPUT, generateICS(events), "utf8");
+fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+fs.writeFileSync(
+  OUTPUT,
+  generateICS(events),
+  "utf8"
+);
+
+const indexHTML = `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>台灣國定假日 ICS</title>
+</head>
+<body>
+  <h1>台灣國定假日</h1>
+  <p>
+    Home Assistant Remote Calendar 使用的 ICS 日曆。
+  </p>
+  <p>
+    <a href="taiwan-holidays.ics">下載台灣國定假日 ICS</a>
+  </p>
+</body>
+</html>
+`;
+
+fs.writeFileSync(
+  path.join(OUTPUT_DIR, "index.html"),
+  indexHTML,
+  "utf8"
+);
 
 console.log(`Generated ${events.length} holiday events.`);
 console.log(`Output: ${OUTPUT}`);
