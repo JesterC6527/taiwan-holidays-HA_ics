@@ -42,16 +42,21 @@
     <meta property="og:url" content="https://tw-holidays.gooliya.com/">
     <meta property="og:title" content="台灣國定假日行事曆・連假與請假攻略｜Taiwan Holidays">
     <meta property="og:description"
-        content="台灣國定假日、連假與補班日行事曆，含農民曆與請假攻略（怎麼請最划算）。提供免費 JSON API 與給 AI agent 使用的 MCP server，資料每月自動同步政府開放資料。">
-    <meta property="og:image" content="https://tw-holidays.gooliya.com/img/og-image.png">
+        content="查台灣國定假日、連假與補班日，還有請假攻略，告訴你怎麼請最少天數休最多天。資料來自政府公開資料，免費使用。">
+    <meta property="og:image" content="https://tw-holidays.gooliya.com/img/og-image-v2.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="台灣國定假日行事曆首頁：下一個連假、全年國定假日與請假攻略">
+    <meta property="og:site_name" content="Taiwan Holidays 台灣國定假日行事曆">
+    <meta property="og:locale" content="zh_TW">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://tw-holidays.gooliya.com/">
     <meta property="twitter:title" content="台灣國定假日行事曆・連假與請假攻略｜Taiwan Holidays">
     <meta property="twitter:description"
-        content="台灣國定假日、連假與補班日行事曆，含農民曆與請假攻略（怎麼請最划算）。提供免費 JSON API 與給 AI agent 使用的 MCP server，資料每月自動同步政府開放資料。">
-    <meta property="twitter:image" content="https://tw-holidays.gooliya.com/img/og-image.png">
+        content="查台灣國定假日、連假與補班日，還有請假攻略，告訴你怎麼請最少天數休最多天。資料來自政府公開資料，免費使用。">
+    <meta property="twitter:image" content="https://tw-holidays.gooliya.com/img/og-image-v2.png">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -59,7 +64,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Outfit:wght@400;500;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="style.css?v=7">
     <!-- GitHub Star 按鈕與版本徽章（自包含樣式，避免與 style.css 待調整項目衝突；顏色走 style.css 的 token，深色才會跟著換）-->
     <style>
         .gh-star-btn {
@@ -524,16 +529,16 @@
             <p id="faqLangNote" class="section-sub font-noto" hidden>The FAQ below is currently in Chinese. Developers: see <a href="llms-full.txt">llms-full.txt</a> for the full English-friendly reference.</p>
             <div class="faq-list">
                 <details class="glass-panel faq-item">
-                    <summary class="font-noto font-bold text-slate-900">2026 年台灣國定假日總共有幾天？</summary>
-                    <p class="font-noto text-slate-600">依政府公告資料，2026 年台灣國定假日（不含週六日）共 22 天，涵蓋開國紀念日、農曆春節、和平紀念日、兒童節、清明節、勞動節、端午節、中秋節、教師節、國慶日、台灣光復節、行憲紀念日等。</p>
+                    <summary id="faqHolidaysQ" class="font-noto font-bold text-slate-900">2026 年台灣國定假日總共有幾天？</summary>
+                    <p id="faqHolidaysA" class="font-noto text-slate-600">依政府公告資料，2026 年台灣國定假日（不含週六日）共 22 天，涵蓋開國紀念日、農曆春節、和平紀念日、兒童節、清明節、勞動節、端午節、中秋節、教師節、國慶日、台灣光復節、行憲紀念日等。</p>
                 </details>
                 <details class="glass-panel faq-item">
-                    <summary class="font-noto font-bold text-slate-900">2026 年最長連假是哪一段？</summary>
-                    <p class="font-noto text-slate-600">農曆春節，依現有政府公告資料自 2/14（六）至 2/22（日）共 9 天，是 2026 年最長的連續假期，實際天數以官方最終公告為準。</p>
+                    <summary id="faqLongestQ" class="font-noto font-bold text-slate-900">2026 年最長連假是哪一段？</summary>
+                    <p id="faqLongestA" class="font-noto text-slate-600">農曆春節，依現有政府公告資料自 2/14（六）至 2/22（日）共 9 天，是 2026 年最長的連續假期，實際天數以官方最終公告為準。</p>
                 </details>
                 <details class="glass-panel faq-item">
-                    <summary class="font-noto font-bold text-slate-900">2026 年有補班日嗎？</summary>
-                    <p class="font-noto text-slate-600">截至目前資料，2026 年尚未有公告需要補班的日期；如政府後續調整，本站資料會透過每月自動同步更新。</p>
+                    <summary id="faqMakeupQ" class="font-noto font-bold text-slate-900">2026 年有補班日嗎？</summary>
+                    <p id="faqMakeupA" class="font-noto text-slate-600">截至目前資料，2026 年尚未有公告需要補班的日期；如政府後續調整，本站資料會透過每月自動同步更新。</p>
                 </details>
                 <details class="glass-panel faq-item">
                     <summary class="font-noto font-bold text-slate-900">這份假日資料多久更新一次、來源是哪裡？</summary>
@@ -591,7 +596,7 @@
     <div id="toast" class="toast font-noto" role="status" aria-live="polite"></div>
 
     <script src="https://unpkg.com/lunar-javascript/lunar.js"></script>
-    <script src="app.js?v=2"></script>
+    <script src="app.js?v=3"></script>
 </body>
 
 </html>
