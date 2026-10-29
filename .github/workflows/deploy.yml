@@ -25,8 +25,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
+          token: ${{ secrets.WORKFLOW_PAT }}
           fetch-depth: 0
 
       - name: Sync upstream repository
@@ -39,10 +40,7 @@ jobs:
           git merge upstream/main --no-edit
 
       - name: Push upstream updates
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git push origin main
+        run: git push origin main
 
   build:
     needs: update
