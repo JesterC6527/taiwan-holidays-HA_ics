@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         strategySubtitle: document.getElementById('strategySubtitle'),
         languageToggle: document.getElementById('languageToggle'),
         langToggleBtn: document.getElementById('langToggleBtn'),
+        posterBtn: document.getElementById('posterBtn'),
         lunarToggleBtn: document.getElementById('lunarToggleBtn'),
         themeToggleBtn: document.getElementById('themeToggleBtn'),
         jumpTodayBtn: document.getElementById('jumpTodayBtn'),
@@ -80,6 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
             jumpToday: "今天",
             jumpTodayTitle: "跳到今天所在的月份",
             lunarToggleText: "農民曆",
+            posterText: "年曆",
+            posterTitle: "開啟一頁年曆（A4，可下載 PNG／PDF）",
             lunarToggle: "顯示農民曆",
             themeAuto: "自動",
             themeLight: "淺色",
@@ -90,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
             shareAria: "分享這個頁面",
             shareTo: "分享：",
             shareCopied: "已複製連結",
+            shareCopy: "複製連結",
             copy: "複製",
             copied: "已複製",
             copyFailed: "無法複製，請手動選取",
@@ -174,6 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
             jumpToday: "Today",
             jumpTodayTitle: "Jump to the current month",
             lunarToggleText: "Lunar",
+            posterText: "Poster",
+            posterTitle: "Open the one-page year calendar (A4, PNG/PDF download)",
             lunarToggle: "Show lunar calendar",
             themeAuto: "Auto",
             themeLight: "Light",
@@ -184,6 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             shareAria: "Share this page",
             shareTo: "Share:",
             shareCopied: "Link copied",
+            shareCopy: "Copy link",
             copy: "Copy",
             copied: "Copied",
             copyFailed: "Copy failed — select the text manually",
@@ -308,6 +315,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-year-slot]').forEach(el => {
             el.textContent = state.currentYear;
         });
+        syncPosterLink();
+    }
+
+    // 一頁年曆只產生「今年起」的年度（generate_pages.MIN_YEAR_OFFSET），過去的年度不顯示按鈕
+    function syncPosterLink() {
+        const btn = elements.posterBtn;
+        if (!btn) return;
+        const year = state.currentYear;
+        btn.hidden = year < todayYear;
+        btn.href = currentLang() === 'en' ? `/en/${year}/calendar/` : `/${year}/calendar/`;
     }
 
     // Initialize App
@@ -427,7 +444,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 分享：優先用系統分享面板，不支援就複製連結
         if (elements.shareBtn) {
-            elements.shareBtn.addEventListener('click', sharePage);
+            elements.shareBtn.addEventListener('click', toggleSharePopover);
+            const copyBtn = document.getElementById('shareCopyBtn');
+            if (copyBtn) copyBtn.addEventListener('click', async () => {
+                const ok = await copyText(location.href);
+                showToast(ok ? t('shareCopied') : t('copyFailed'));
+                closeSharePopover();
+            });
+            document.addEventListener('click', (e) => {
+                const menu = elements.shareBtn.closest('.share-menu');
+                if (menu && !menu.contains(e.target)) closeSharePopover();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') { closeSharePopover(); }
+            });
         }
 
         // 複製程式碼片段
@@ -1398,23 +1428,30 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => target.classList.remove('flash'), 1600);
     }
 
-    // 分享與複製
-    async function sharePage() {
-        const shareData = {
-            title: document.title,
-            text: t('subtitle'),
-            url: location.href
+    // 分享：頁首按鈕展開社群圖示列（與頁尾一致），連結帶目前網址
+    function closeSharePopover() {
+        const pop = document.getElementById('sharePopover');
+        if (!pop || pop.hidden) return;
+        pop.hidden = true;
+        elements.shareBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleSharePopover() {
+        const pop = document.getElementById('sharePopover');
+        if (!pop) return;
+        if (!pop.hidden) { closeSharePopover(); return; }
+        const url = encodeURIComponent(location.href);
+        const text = encodeURIComponent(document.title);
+        const targets = {
+            facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+            twitter: `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
+            linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+            threads: `https://www.threads.net/intent/post?text=${text}%20${url}`,
+            line: `https://social-plugins.line.me/lineit/share?url=${url}`
         };
-        if (navigator.share) {
-            try {
-                await navigator.share(shareData);
-                return;
-            } catch (e) {
-                if (e && e.name === 'AbortError') return; // 使用者取消
-            }
-        }
-        const ok = await copyText(location.href);
-        showToast(ok ? t('shareCopied') : t('copyFailed'));
+        pop.querySelectorAll('[data-share]').forEach((a) => { a.href = targets[a.dataset.share]; });
+        pop.hidden = false;
+        elements.shareBtn.setAttribute('aria-expanded', 'true');
     }
 
     async function copyText(text) {
